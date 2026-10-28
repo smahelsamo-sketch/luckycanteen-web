@@ -1,147 +1,191 @@
 """Generuje statický web Lucky Canteen (náhrada za WordPress/Mioweb).
 
-python3 build.py  → index.html + podstránky v priečinkoch (zachované staré URL /o-nas/, /denne-menu/ …)
-Obsah prevzatý z luckycanteen.sk (28. 10. 2026). Denné menu ide z widgetu Menučka.sk – netreba ho tu meniť.
+python3 build.py  → index.html + podstránky v priečinkoch (rovnaké URL ako doteraz: /o-nas/, /denne-menu/ …)
+Texty, poradie sekcií a fotky sú 1:1 zo súčasného luckycanteen.sk (28. 10. 2026) – NEMENIŤ (Samuel).
+Farby: čierna + červená z loga (#9C2021), nie žltá.
+Denné menu = widget Menučka.sk; týždenné menu = obrázok img/tyzdenne-menu.jpg (vymeniť každý týždeň).
 """
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-TEL = "+421 948 130 504"
-TEL_LINK = "+421948130504"
-MAIL = "objednavky@canteen.sk"
-ADRESA = "Ivánska cesta 30/B, Bratislava"
 OBJEDNAVKA = "https://luckycanteen.order.app.hd.digital/menus"
 MENUCKA = "https://www.menucka.sk/widget/main/luckycanteen/weekmenu"
 
-RANAJKY = [
-    ("Praženica s jarnou cibuľkou", "4,90 €"),
-    ("Volské oká", "4,90 €"),
-    ("Ham & eggs", "4,90 €"),
-    ("Bacon & eggs", "4,90 €"),
-    ("Omeleta so syrom", "4,90 €"),
-    ("Čoko proteínová ovsená kaša", "5,00 €"),
-    ("Chia puding", "3,50 €"),
-]
+NAV = [("", "Úvod"), ("o-nas/", "O nás"), ("denne-menu/", "Denné menu"), ("ranajkove-menu/", "Raňajkové menu"),
+       ("https://www.tysomaru.sk/blog/", "Blog"), ("kontakt/", "Kontakt"),
+       ("https://www.tysomaru.sk/uvod/", "Ty Somaru"), (OBJEDNAVKA, "Online objednávka")]
 
-NAV = [("", "Úvod"), ("o-nas/", "O nás"), ("denne-menu/", "Denné menu"),
-       ("ranajkove-menu/", "Raňajkové menu"), ("kontakt/", "Kontakt")]
+RANAJKY_UVOD = [("Praženica s jarnou cibuľkou", "4.90€"), ("Volské oká", "4.90€"), ("Ham&eggs", "4.90€"),
+                ("Back&eggs", "4.90€"), ("Omeleta so syrom", "4.90€")]
+RANAJKY_VSETKY = RANAJKY_UVOD + [("Čoko proteínová ovsená kaša", "5,00€"), ("Chia puding", "3.50€")]
 
-CSS = """
-:root{--bg:#121212;--panel:#1c1c1c;--line:#2c2c2c;--text:#f2efe9;--muted:#b9b3a8;--gold:#f2b43a;--gold-dark:#d99a1c}
-*{box-sizing:border-box}html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.6}
-a{color:var(--gold)}img{max-width:100%;display:block}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
-header{position:sticky;top:0;z-index:10;background:rgba(18,18,18,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px}
-header img{height:52px;width:auto}
-nav{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center}
-nav a{color:var(--text);text-decoration:none;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:15px}
-nav a:hover,nav a[aria-current]{color:var(--gold)}
-.btn{display:inline-block;background:var(--gold);color:#1a1300;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;padding:12px 22px;border-radius:6px;font-weight:600}
-.btn:hover{background:var(--gold-dark)}.btn.ghost{background:transparent;color:var(--gold);border:2px solid var(--gold)}
-h1,h2,h3{font-family:'Oswald',sans-serif;font-weight:600;line-height:1.15;letter-spacing:.01em}
-h1{font-size:clamp(34px,6vw,60px);margin:0 0 14px}h2{font-size:clamp(26px,4vw,38px);margin:0 0 16px;color:var(--gold)}
-.hero{position:relative;min-height:72vh;display:flex;align-items:center;background:linear-gradient(rgba(10,10,10,.62),rgba(10,10,10,.82)),url(IMG/hero.jpg) center/cover}
-.hero p{max-width:640px;color:#e8e2d6;font-size:19px}.hero .tag{color:var(--gold);font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.12em}
-.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
-section{padding:64px 0}section.alt{background:var(--panel)}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:36px;align-items:center}
-.photos{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.photos img{border-radius:8px;aspect-ratio:16/10;object-fit:cover;width:100%}
-.menu-list{list-style:none;padding:0;margin:0}.menu-list li{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px dashed var(--line)}
-.menu-list span:last-child{color:var(--gold);font-weight:600;white-space:nowrap}
-.note{color:var(--muted)}
-.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
-.info div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px}
-.info h3{margin:0 0 8px;color:var(--gold);font-size:20px}
-iframe.menucka{width:100%;min-height:900px;border:0;border-radius:8px;background:#fff}
-footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:15px}
-footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
-@media (max-width:760px){header .wrap{flex-direction:column;padding:10px 16px}nav{justify-content:center}section{padding:44px 0}.wrap{padding:0 16px}}
+TORN_BOTTOM = "polygon(0 0,100% 0,100% 92%,93% 96%,85% 91%,76% 97%,66% 93%,57% 98%,46% 92%,37% 97%,27% 93%,17% 98%,8% 93%,0 97%)"
+TORN_TOP = "polygon(0 4%,9% 0,19% 5%,29% 1%,39% 6%,50% 1%,61% 5%,71% 0,82% 5%,92% 1%,100% 4%,100% 100%,0 100%)"
+
+CSS = f"""
+:root{{--black:#111111;--red:#9C2021;--red-dark:#7d191a;--white:#ffffff;--line:#e6e6e6;--muted:#555}}
+*{{box-sizing:border-box}}html{{scroll-behavior:smooth}}
+body{{margin:0;background:var(--white);color:var(--black);font-family:'Open Sans',system-ui,sans-serif;font-size:16px;line-height:1.7}}
+img{{max-width:100%;display:block}}a{{color:var(--red)}}
+.wrap{{max-width:1080px;margin:0 auto;padding:0 20px}}
+h1,h2,h3{{font-family:'Oswald',sans-serif;font-weight:400;line-height:1.15;margin:0 0 18px}}
+header{{position:absolute;top:0;left:0;right:0;z-index:20}}
+header .wrap{{max-width:1200px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px}}
+header .logo img{{height:78px;width:auto}}
+nav{{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;justify-content:flex-end}}
+nav a{{color:#fff;text-decoration:none;font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:13px;letter-spacing:.03em;padding-bottom:3px;border-bottom:2px solid transparent}}
+nav a:hover,nav a[aria-current]{{border-bottom-color:var(--red)}}
+.menu-toggle{{display:none;background:none;border:1px solid #fff;color:#fff;font-family:'Oswald',sans-serif;padding:6px 12px;cursor:pointer}}
+.hero{{position:relative;color:#fff;text-align:center;background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),url(IMG/hero.jpg) center/cover;clip-path:{TORN_BOTTOM};padding:170px 0 140px}}
+.hero.sub{{padding:190px 0 120px}}
+.hero h1{{font-size:clamp(34px,6vw,62px);text-transform:none}}
+.hero p{{max-width:880px;margin:0 auto 26px;font-size:15px}}
+.btn{{display:inline-block;font-family:'Oswald',sans-serif;text-transform:uppercase;text-decoration:none;font-size:17px;padding:12px 30px;border:2px solid currentColor;color:var(--black);background:transparent}}
+.btn:hover{{background:var(--red);border-color:var(--red);color:#fff}}
+.hero .btn{{color:#fff;margin:8px}}
+.btn.red{{background:var(--red);border-color:var(--red);color:#fff}}.btn.red:hover{{background:var(--red-dark)}}
+section{{padding:70px 0}}
+.title{{font-size:clamp(30px,4.5vw,44px);text-transform:uppercase;text-align:center}}
+.grid2{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px;align-items:center}}
+.center{{text-align:center}}
+.menu-list{{list-style:none;padding:0;margin:0}}
+.menu-list li{{display:flex;justify-content:space-between;gap:16px;padding:12px 12px;border-bottom:1px solid var(--line);font-family:'Oswald',sans-serif;font-size:18px}}
+.black{{background:var(--black);color:#fff;clip-path:{TORN_TOP};margin-top:-30px;padding:90px 0 110px}}
+.black.both{{clip-path:polygon(0 4%,9% 0,19% 5%,29% 1%,39% 6%,50% 1%,61% 5%,71% 0,82% 5%,92% 1%,100% 4%,100% 92%,90% 97%,78% 92%,66% 98%,54% 93%,42% 98%,30% 92%,18% 97%,8% 92%,0 96%)}}
+.photos{{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:36px;align-items:center}}
+.photos img{{width:100%;aspect-ratio:16/11;object-fit:cover}}
+.photos img:nth-child(2){{aspect-ratio:16/13}}
+.widget{{max-width:950px;margin:0 auto;box-shadow:0 2px 18px rgba(0,0,0,.08);border-radius:14px;overflow:hidden}}
+iframe.menucka{{width:100%;min-height:950px;border:0;background:#fff;display:block}}
+.weekly{{max-width:970px;margin:40px auto 0}}
+.lead{{max-width:820px;margin:0 auto;text-align:center}}
+.contact-band{{position:relative;background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),url(IMG/foto6.jpg) center/cover;padding:130px 20px;clip-path:polygon(0 3%,8% 0,18% 4%,30% 1%,42% 4%,55% 0,68% 4%,80% 1%,92% 4%,100% 1%,100% 97%,90% 100%,78% 97%,66% 100%,54% 96%,42% 100%,30% 97%,18% 100%,8% 97%,0 100%)}}
+.contact-box{{background:#fff;max-width:470px;margin:0 auto;padding:40px 30px;text-align:center}}
+.contact-box h2{{font-size:42px;text-transform:uppercase}}
+.contact-box .big{{display:block;font-family:'Oswald',sans-serif;font-size:clamp(24px,4vw,40px);color:var(--black);margin-top:16px}}
+.contact-box .ico{{color:var(--red)}}
+.text h2{{font-size:clamp(26px,3.6vw,34px);text-align:center;margin-top:34px}}
+.text p{{max-width:820px;margin:0 auto 14px;text-align:center}}
+footer{{background:var(--black);color:#fff;padding:60px 0 24px;margin-top:40px}}
+footer .cols{{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px}}
+footer h3{{font-size:20px;text-transform:uppercase;margin-bottom:10px}}
+footer a{{color:#fff}}footer small{{display:block;text-align:center;margin-top:40px;color:#aaa}}
+.sticky-order{{position:fixed;right:18px;bottom:18px;z-index:30}}
+.popup{{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:40;padding:16px}}
+.popup.open{{display:flex}}
+.popup .box{{background:#fff;max-width:420px;width:100%;text-align:center;position:relative}}
+.popup .box img{{width:100%;aspect-ratio:16/10;object-fit:cover}}
+.popup .box h2{{font-size:34px;text-transform:uppercase;margin:24px 0 16px}}
+.popup .box .btn{{margin-bottom:28px}}
+.popup .close{{position:absolute;top:6px;right:10px;background:none;border:0;color:#fff;font-size:30px;cursor:pointer;text-shadow:0 1px 4px #000}}
+@media (max-width:860px){{
+ header .wrap{{flex-wrap:wrap}}.menu-toggle{{display:block}}
+ nav{{display:none;width:100%;flex-direction:column;align-items:flex-start;background:rgba(0,0,0,.92);padding:14px}}nav.open{{display:flex}}
+ header .logo img{{height:60px}}.hero{{padding:140px 0 110px}}section{{padding:50px 0}}.wrap{{padding:0 16px}}
+}}
 """
 
+FOOTER = """<footer><div class="wrap"><div class="cols">
+<div><h3>Naša adresa</h3>Ivánska cesta 30/B, Bratislava</div>
+<div><h3>Otvorené Po - Pia</h3>Raňajky: 7:00 - 10:30<br>Obedy: 11:00 - 14:00</div>
+<div><h3>Kontakt</h3>Tel: <a href="tel:+421948130504">+421948130504</a><br>Email: <a href="mailto:objednavky@canteen.sk">objednavky@canteen.sk</a></div>
+</div><small>© 2026 Vytvorené s láskou DigiLaf</small></div></footer>"""
 
-def page(path, title, desc, body, active):
-    depth = 1 if path else 0
-    up = "../" * depth
-    nav = "".join(
-        f'<a href="{up}{href}"{" aria-current=page" if href == active else ""}>{label}</a>' for href, label in NAV
-    )
+
+def page(path, title, desc, body, active, popup=False):
+    up = "../" if path else ""
+    links = []
+    for href, label in NAV:
+        url = href if href.startswith("http") else up + href
+        cur = " aria-current=page" if href == active else ""
+        links.append(f'<a href="{url}"{cur}>{label}</a>')
+    pop = ""
+    if popup:
+        pop = f"""<div class="popup" id="popup"><div class="box"><button class="close" aria-label="Zavrieť" onclick="closePop()">×</button>
+<img src="{up}img/foto5.jpg" alt=""><h2>Objednať teraz</h2><a class="btn red" href="{OBJEDNAVKA}">Objednať</a></div></div>
+<script>function closePop(){{document.getElementById('popup').classList.remove('open');try{{sessionStorage.setItem('lcPop','1')}}catch(e){{}}}}
+try{{if(!sessionStorage.getItem('lcPop'))setTimeout(()=>document.getElementById('popup').classList.add('open'),1500)}}catch(e){{}}</script>"""
     html = f"""<!DOCTYPE html>
 <html lang="sk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title><meta name="description" content="{desc}">
-<link rel="icon" href="{up}img/logo.png">
+<link rel="icon" href="{up}img/logo-cervene.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Oswald:wght@400;500&display=swap" rel="stylesheet">
 <!-- GTM-TX256C9Z + Meta Pixel doplniť až s cookie lištou (súhlas) -->
 <style>{CSS.replace("IMG/", up + "img/")}</style></head>
 <body>
-<header><div class="wrap"><a href="{up}"><img src="{up}img/logo.png" alt="Lucky Canteen" width="63" height="52"></a>
-<nav>{nav}<a class="btn" href="{OBJEDNAVKA}">Objednať</a></nav></div></header>
+<header><div class="wrap"><a class="logo" href="{up or './'}"><img src="{up}img/logo-invert.png" alt="Lucky Canteen"></a>
+<button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')">Menu</button>
+<nav>{"".join(links)}</nav></div></header>
 <main>{body.replace("IMG/", up + "img/")}</main>
-<footer><div class="wrap"><span>Lucky Canteen · {ADRESA} (budova Aircraft)</span>
-<span>Tel.: <a href="tel:{TEL_LINK}">{TEL}</a> · <a href="mailto:{MAIL}">{MAIL}</a></span>
-<span><a href="https://www.tysomaru.sk/uvod/">Ty Somaru</a> · <a href="https://www.tysomaru.sk/blog/">Blog</a></span></div></footer>
+{FOOTER}
+<a class="btn red sticky-order" href="{OBJEDNAVKA}">Objednať teraz</a>
+{pop}
 </body></html>"""
-    out = ROOT / path / "index.html" if path else ROOT / "index.html"
+    out = (ROOT / path / "index.html") if path else (ROOT / "index.html")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
 
 
-INFO = f"""<div class="info">
-<div><h3>Adresa</h3>{ADRESA}<br>budova Aircraft</div>
-<div><h3>Otvorené Po – Pi</h3>Raňajky: 7:00 – 10:30<br>Obedy: 11:00 – 14:00</div>
-<div><h3>Kontakt</h3>Tel.: <a href="tel:{TEL_LINK}">{TEL}</a><br><a href="mailto:{MAIL}">{MAIL}</a></div>
-</div>"""
+def menu_list(items):
+    return '<ul class="menu-list">' + "".join(f"<li><span>{n}</span><span>{c}</span></li>" for n, c in items) + "</ul>"
 
-RANAJKY_HTML = '<ul class="menu-list">' + "".join(f"<li><span>{n}</span><span>{c}</span></li>" for n, c in RANAJKY) + "</ul>"
-RANAJKY_NOTE = """<p class="note">Všetky vaječné raňajky pripravujeme zo 4 kvalitných vajec z voľného výbehu (Slovensko).
-Ku každým raňajkám je v cene 1 kus pečiva alebo 2 krajce chleba a čerstvá zelenina.</p>
-<p class="note">Každý deň pre vás pripravujeme aj domáce dezerty, smoothie bowls, proteínové nátierky
-a vždy čerstvé pečivo priamo z remeselnej pekárne.</p>"""
+
+def sub_hero(title):
+    return f'<section class="hero sub"><div class="wrap"><h1>{title}</h1></div></section>'
+
+
+MENUCKA_BLOCK = f'<div class="widget"><iframe class="menucka" src="{MENUCKA}" title="Týždenné menu – Menučka.sk" loading="lazy"></iframe></div>'
 
 page("", "Denné menu a raňajky pri letisku Bratislava | Lucky Canteen",
-     "Moderná kantína v budove Aircraft na Ivánskej ceste – raňajky, denné obedové menu a rozvoz.",
-     f"""<section class="hero"><div class="wrap"><div class="tag">Budova Aircraft · Ivánska cesta</div>
-<h1>Chutné denné menu a raňajky pri letisku v Bratislave</h1>
-<p>Poctivé, rýchle a cenovo dostupné jedlo pre všetkých, ktorí pracujú v okolí letiska a obchodných zón v Ružinove. Už aj na rozvoz.</p>
-<div class="actions"><a class="btn" href="{OBJEDNAVKA}">Online objednávka</a><a class="btn ghost" href="denne-menu/">Denné menu</a></div></div></section>
-<section><div class="wrap grid2"><div><h2>Raňajkové menu</h2>{RANAJKY_HTML}<p style="margin-top:18px"><a class="btn ghost" href="ranajkove-menu/">Celé raňajkové menu</a></p></div>
-<img src="IMG/foto4.jpg" alt="Raňajky v Lucky Canteen" style="border-radius:8px"></div></section>
-<section class="alt"><div class="wrap"><h2>Raňajkové a obedové menu najvyššej kvality</h2>
-<p>Raňajky a obedy pripravujeme z kvalitných slovenských surovín – vajíčka od sliepok z voľného chovu a mäso z overených fariem. Poctivé chute, na ktoré sa oplatí vrátiť.</p>
-<div class="photos"><img src="IMG/foto1.jpg" alt="Polievka"><img src="IMG/foto5.jpg" alt="Obedové menu"><img src="IMG/foto6.jpg" alt="Jedlo z Lucky Canteen"></div></div></section>
-<section><div class="wrap"><h2>Kde nás nájdete</h2>{INFO}</div></section>""", "")
+     "Lucky Canteen – moderná kantína v budove Aircraft na Ivánskej ceste. Denné menu, raňajky a rozvoz pri letisku Bratislava.",
+     f"""<section class="hero"><div class="wrap"><h1>Chutné denné menu a raňajky<br>pri letisku v Bratislave<br>už aj na rozvoz</h1>
+<p>Vitajte v Lucky Canteen, vašej modernej kantíne priamo v budove Aircraft na Ivánskej ceste. Sme tu pre všetkých, ktorí hľadajú poctivé, rýchle a cenovo dostupné jedlo v okolí bratislavského letiska a obchodných zón v Ružinove - Galvaniho. Či už sa ponáhľate na ranný míting, alebo hľadáte kvalitný obed s kolegami, u nás ste vždy vítaní.</p>
+<a class="btn" href="denne-menu/">Menu</a><br><a class="btn" href="{OBJEDNAVKA}">Online objednávka</a></div></section>
+<section><div class="wrap grid2"><div class="center"><h2 class="title">Raňajkové menu</h2><img src="IMG/jedlo.jpg" alt="Raňajky" style="max-width:300px;margin:0 auto 24px">
+<a class="btn" href="ranajkove-menu/">Pozrieť celé raňajkové menu</a></div><div>{menu_list(RANAJKY_UVOD)}</div></div></section>
+<section class="black both"><div class="wrap photos"><img src="IMG/foto4.jpg" alt=""><img src="IMG/foto1.jpg" alt=""><img src="IMG/foto5.jpg" alt=""></div></section>
+<section><div class="wrap"><h2 class="title">Denné menu</h2>{MENUCKA_BLOCK}
+<img class="weekly" src="IMG/tyzdenne-menu.jpg" alt="Týždenné menu Lucky Canteen"></div></section>
+<section><div class="wrap lead"><h2 class="title">Raňajkové a obedové menu najvyššej kvality</h2>
+<p>Raňajky a obedy pripravujeme z kvalitných slovenských surovín – vajíčka od sliepok z voľného chovu a mäso z overených fariem. Poctivé chute, na ktoré sa oplatí vrátiť.</p></div></section>
+<section class="contact-band"><div class="contact-box"><h2>Kontaktujte nás</h2><p>Ak máte akékoľvek otázky, neváhajte nás kontaktovať.</p>
+<a class="big" href="tel:+421948130504"><span class="ico">☏</span> +421948130504</a>
+<a class="big" href="mailto:objednavky@canteen.sk"><span class="ico">✉</span> objednavky@canteen.sk</a></div></section>""",
+     "", popup=True)
 
 page("o-nas", "O nás | Poctivá kantína v budove Aircraft | Lucky Canteen",
      "Lucky Canteen – poctivá kantína na Ivánskej ceste v budove Aircraft pri letisku Bratislava.",
-     f"""<section><div class="wrap grid2"><div><h1>Vaša poctivá kantína na Ivánskej ceste</h1>
-<p>Sme Lucky Canteen a veríme, že stravovanie počas pracovného dňa by nemalo byť len nutnou rutinou, ale chvíľou, na ktorú sa budete tešiť. Naším cieľom je priniesť kvalitné, čerstvé a s radosťou pripravené jedlo ľuďom, ktorí pracujú v rýchlom tempe a potrebujú dobiť energiu na zvyšok dňa.</p></div>
-<img src="IMG/jedlo.jpg" alt="Jedlo z Lucky Canteen" style="border-radius:8px"></div></section>
-<section class="alt"><div class="wrap"><h2>Rýchle obedy bez kompromisov v kvalite</h2>
+     sub_hero("LUCKY CANTEEN") + """<section class="text"><div class="wrap">
+<h2>Vaša poctivá kantína na Ivánskej ceste</h2>
+<p>Sme Lucky Canteen a veríme, že stravovanie počas pracovného dňa by nemalo byť len nutnou rutinou, ale chvíľou, na ktorú sa budete tešiť. Naším cieľom je priniesť kvalitné, čerstvé a s radosťou pripravené jedlo ľuďom, ktorí pracujú v rýchlom tempe a potrebujú dobiť energiu na zvyšok dňa.</p>
+<h2>Rýchle obedy bez kompromisov v kvalite</h2>
 <p>Koncept Lucky Canteen vznikol z jednoduchej myšlienky: ponúknuť ľuďom pracujúcim v okolí poctivé jedlo, aké by si uvarili sami doma, ak by na to mali čas.</p>
-<p>Zabudnite na stereotypy o unavených závodných jedálňach. U nás v kuchyni nerobíme skratky. Zakladáme si na starostlivo vyberaných surovinách, osvedčených receptoch a vyvážených porciách. Či už máte práve chuť na výdatnú tradičnú slovenskú klasiku, poctivú polievku, alebo ľahšie a moderné jedlo, naše denné menu zostavujeme tak, aby si v ňom každý našiel to svoje.</p></div></section>
-<section><div class="wrap"><h2>Prečo práve budova Aircraft?</h2>
+<p>Zabudnite na stereotypy o unavených závodných jedálňach. U nás v kuchyni nerobíme skratky. Zakladáme si na starostlivo vyberaných surovinách, osvedčených receptoch a vyvážených porciách. Či už máte práve chuť na výdatnú tradičnú slovenskú klasiku, poctivú polievku, alebo ľahšie a moderné jedlo, naše denné menu zostavujeme tak, aby si v ňom každý našiel to svoje.</p>
+<h2>Prečo práve budova Aircraft?</h2>
 <p>Lokalitu sme si nevybrali náhodou. Naším domovom sa stala budova Aircraft na Ivánskej ceste 30/B, strategické miesto v tesnej blízkosti bratislavského letiska a ružinovských biznis zón. Vieme, že vaša obedná prestávka je často ohraničená časom. Preto sme tu – priamo vo vašom susedstve, aby ste drahocenné minúty nestrácali presunmi cez polovicu mesta. Ak to k nám z kancelárie predsa len nestíhate, náš spoľahlivý rozvoz vám raňajky aj obedy doručí rovno na recepciu alebo na stôl.</p>
-<div class="actions"><a class="btn" href="{OBJEDNAVKA}">Objednať rozvoz</a></div></div></section>""", "o-nas/")
+</div></section>""", "o-nas/")
 
 page("denne-menu", "Denné obedové menu Bratislava - Ivánska cesta | Lucky Canteen",
      "Aktuálne denné obedové menu Lucky Canteen – zastavte sa alebo objednajte donášku.",
-     f"""<section><div class="wrap"><h1>Aktuálne denné obedové menu</h1>
-<p>Zastavte sa alebo si objednajte donášku. Obedy podávame Po – Pi 11:00 – 14:00.</p>
-<div class="actions" style="margin-bottom:24px"><a class="btn" href="{OBJEDNAVKA}">Online objednávka</a></div>
-<iframe class="menucka" src="{MENUCKA}" title="Denné menu Lucky Canteen (Menučka.sk)" loading="lazy"></iframe></div></section>""", "denne-menu/")
+     sub_hero("Aktuálne denné obedové menu: Zastavte sa alebo objednajte donášku")
+     + f'<section><div class="wrap">{MENUCKA_BLOCK}</div></section>', "denne-menu/")
 
 page("ranajkove-menu", "Raňajky Bratislava letisko | Raňajkové menu | Lucky Canteen",
-     "Raňajkové menu Lucky Canteen – vajíčka z voľného výbehu, ovsená kaša, chia puding. Po – Pi 7:00 – 10:30.",
-     f"""<section><div class="wrap grid2"><div><h1>Raňajkové menu</h1>{RANAJKY_HTML}{RANAJKY_NOTE}
-<p class="note">Raňajky podávame Po – Pi 7:00 – 10:30.</p></div><img src="IMG/foto4.jpg" alt="Raňajky" style="border-radius:8px"></div></section>""", "ranajkove-menu/")
+     "Raňajkové menu Lucky Canteen pri letisku Bratislava – Ivánska cesta 30/B.",
+     sub_hero("RAŇAJKOVÉ MENU") + f"""<section><div class="wrap grid2"><img src="IMG/jedlo.jpg" alt="Raňajky" style="max-width:360px;margin:0 auto">
+<div>{menu_list(RANAJKY_VSETKY)}</div></div>
+<div class="wrap text" style="margin-top:30px"><p>Všetky vaječné raňajky pripravujeme zo 4 kvalitných vajec z voľného výbehu (Slovensko)</p>
+<p>Ku každým raňajkám je v cene 1 kus pečiva alebo 2 krajce chleba a čerstvá zelenina.</p>
+<p>Každý deň pre vás pripravujeme aj:<br>– domáce dezerty,<br>– smoothie bowls,<br>– proteínové nátierky<br>a vždy čerstvé pečivo priamo z remeselnej pekárne.</p></div></section>""",
+     "ranajkove-menu/")
 
-page("kontakt", "Kontakt | Lucky Canteen – Ivánska cesta 30/B, Bratislava",
-     "Kontakt na Lucky Canteen: Ivánska cesta 30/B (Aircraft), tel. +421 948 130 504, objednavky@canteen.sk.",
-     f"""<section><div class="wrap"><h1>Kontakt</h1><p>Ak máte akékoľvek otázky, neváhajte nás kontaktovať. Objednávky na rozvoz vybavíte najrýchlejšie online.</p>
-{INFO}<div class="actions"><a class="btn" href="{OBJEDNAVKA}">Online objednávka</a>
-<a class="btn ghost" href="https://maps.google.com/?q=Iv%C3%A1nska+cesta+30%2FB+Bratislava">Navigovať</a></div></div></section>""", "kontakt/")
+page("kontakt", "Kontakt, adresa a donáška | Aircraft, Ivánska cesta | Lucky Canteen",
+     "Kontakt na Lucky Canteen: Ivánska cesta 30/B (Aircraft), Bratislava.",
+     sub_hero("Kontakt:<br>Tešíme sa na vašu návštevu") + """<section><div class="wrap grid2" style="align-items:start">
+<div><h2>Kontakt</h2><p>Ak máte akékoľvek otázky, neváhajte nás kontaktovať.</p>
+<p>☏ <a href="tel:+421948130504">+421 948 130 504</a></p><p>✉ <a href="mailto:objednavky@canteen.sk">objednavky@canteen.sk</a></p></div>
+<div><h2>Naša adresa</h2><p><a href="https://maps.google.com/?q=Iv%C3%A1nska+cesta+30%2FB+Bratislava"><strong>Ivánska cesta 30/B, Bratislava</strong></a></p>
+<img src="IMG/aircraft.jpg" alt="Budova Aircraft, Ivánska cesta 30/B"></div></div></section>""", "kontakt/")
 
 print("hotovo")
