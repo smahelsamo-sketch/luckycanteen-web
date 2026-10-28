@@ -189,3 +189,18 @@ page("kontakt", "Kontakt, adresa a donáška | Aircraft, Ivánska cesta | Lucky 
 <img src="IMG/aircraft.jpg" alt="Budova Aircraft, Ivánska cesta 30/B"></div></div></section>""", "kontakt/")
 
 print("hotovo")
+
+# Zásady ochrany súkromia pre internú Google appku „Claude asistent“ (Google OAuth vyžaduje verejný odkaz).
+# Nie je v menu webu – len priamy odkaz.
+page("ochrana-sukromia-claude-asistent", "Zásady ochrany súkromia – Claude asistent",
+     "Zásady ochrany súkromia internej aplikácie Claude asistent.",
+     sub_hero("Zásady ochrany súkromia – Claude asistent") + """<section class="text"><div class="wrap">
+<p><strong>Claude asistent</strong> je interná aplikácia Samuela Šmahela (kontakt: smahel.samo@gmail.com), ktorú používa výhradne on sám na správu vlastných pracovných účtov Google (pošta, kalendár, Disk, Tabuľky, Dokumenty, Google Analytics, Search Console, Tag Manager). Aplikácia nie je určená verejnosti.</p>
+<h2>Aké údaje aplikácia používa</h2>
+<p>Aplikácia pristupuje len k údajom v Google účtoch, ktorých vlastník jej prístup výslovne povolil. Údaje sa čítajú a spracúvajú len na počítači vlastníka na účel správy jeho pošty, kalendára, úloh a štatistík webov.</p>
+<h2>Uchovávanie a zdieľanie</h2>
+<p>Prístupové tokeny sú uložené len na zariadení vlastníka. Údaje z Google účtov aplikácia nepredáva, nezverejňuje ani neposkytuje tretím stranám a nepoužíva ich na reklamu. Využitie údajov získaných cez Google API je v súlade s <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a> vrátane požiadaviek Limited Use.</p>
+<h2>Zrušenie prístupu</h2>
+<p>Prístup možno kedykoľvek zrušiť v nastaveniach Google účtu (Zabezpečenie → Aplikácie a služby tretích strán).</p>
+<p>Posledná aktualizácia: 28. 10. 2026</p>
+</div></section>""", "")
