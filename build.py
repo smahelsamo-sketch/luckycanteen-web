@@ -25,7 +25,7 @@ TORN_TOP = "polygon(0 4%,9% 0,19% 5%,29% 1%,39% 6%,50% 1%,61% 5%,71% 0,82% 5%,92
 CSS = f"""
 :root{{--black:#111111;--red:#9C2021;--red-dark:#7d191a;--white:#ffffff;--line:#e6e6e6;--muted:#555}}
 *{{box-sizing:border-box}}html{{scroll-behavior:smooth}}
-body{{margin:0;background:var(--white);color:var(--black);font-family:'Open Sans',system-ui,sans-serif;font-size:16px;line-height:1.7}}
+html,body{{overflow-x:hidden}}body{{margin:0;background:var(--white);color:var(--black);font-family:'Open Sans',system-ui,sans-serif;font-size:16px;line-height:1.7}}
 img{{max-width:100%;display:block}}a{{color:var(--red)}}
 .wrap{{max-width:1080px;margin:0 auto;padding:0 20px}}
 h1,h2,h3{{font-family:'Oswald',sans-serif;font-weight:400;line-height:1.15;margin:0 0 18px}}
@@ -57,12 +57,12 @@ section{{padding:70px 0}}
 .photos img:nth-child(2){{aspect-ratio:16/13}}
 .widget{{max-width:950px;margin:0 auto;box-shadow:0 2px 18px rgba(0,0,0,.08);border-radius:14px;overflow:hidden}}
 iframe.menucka{{width:100%;min-height:950px;border:0;background:#fff;display:block}}
-.weekly{{max-width:970px;margin:40px auto 0}}
+.weekly{{width:100%;max-width:970px;height:auto;margin:40px auto 0}}
 .lead{{max-width:820px;margin:0 auto;text-align:center}}
 .contact-band{{position:relative;background:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),url(IMG/foto6.jpg) center/cover;padding:130px 20px;clip-path:polygon(0 3%,8% 0,18% 4%,30% 1%,42% 4%,55% 0,68% 4%,80% 1%,92% 4%,100% 1%,100% 97%,90% 100%,78% 97%,66% 100%,54% 96%,42% 100%,30% 97%,18% 100%,8% 97%,0 100%)}}
 .contact-box{{background:#fff;max-width:470px;margin:0 auto;padding:40px 30px;text-align:center}}
 .contact-box h2{{font-size:42px;text-transform:uppercase}}
-.contact-box .big{{display:block;font-family:'Oswald',sans-serif;font-size:clamp(24px,4vw,40px);color:var(--black);margin-top:16px}}
+.contact-box .big{{display:block;overflow-wrap:anywhere;font-family:'Oswald',sans-serif;font-size:clamp(24px,4vw,40px);color:var(--black);margin-top:16px}}
 .contact-box .ico{{color:var(--red)}}
 .text h2{{font-size:clamp(26px,3.6vw,34px);text-align:center;margin-top:34px}}
 .text p{{max-width:820px;margin:0 auto 14px;text-align:center}}
