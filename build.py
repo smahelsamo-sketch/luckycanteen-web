@@ -142,7 +142,7 @@ page("", "Denné menu a raňajky pri letisku Bratislava | Lucky Canteen",
      f"""<section class="hero"><div class="wrap"><h1>Chutné denné menu a raňajky<br>pri letisku v Bratislave<br>už aj na rozvoz</h1>
 <p>Vitajte v Lucky Canteen, vašej modernej kantíne priamo v budove Aircraft na Ivánskej ceste. Sme tu pre všetkých, ktorí hľadajú poctivé, rýchle a cenovo dostupné jedlo v okolí bratislavského letiska a obchodných zón v Ružinove - Galvaniho. Či už sa ponáhľate na ranný míting, alebo hľadáte kvalitný obed s kolegami, u nás ste vždy vítaní.</p>
 <a class="btn" href="denne-menu/">Menu</a><br><a class="btn" href="{OBJEDNAVKA}">Online objednávka</a></div></section>
-<section><div class="wrap grid2"><div class="center"><h2 class="title">Raňajkové menu</h2><img src="IMG/jedlo.jpg" alt="Raňajky" style="max-width:300px;margin:0 auto 24px">
+<section><div class="wrap grid2"><div class="center"><h2 class="title">Raňajkové menu</h2><img src="IMG/jedlo.jpg" alt="Raňajky" style="max-width:min(300px,100%);margin:0 auto 24px">
 <a class="btn" href="ranajkove-menu/">Pozrieť celé raňajkové menu</a></div><div>{menu_list(RANAJKY_UVOD)}</div></div></section>
 <section class="black both"><div class="wrap photos"><img src="IMG/foto4.jpg" alt=""><img src="IMG/foto1.jpg" alt=""><img src="IMG/foto5.jpg" alt=""></div></section>
 <section><div class="wrap"><h2 class="title">Denné menu</h2>{MENUCKA_BLOCK}
@@ -173,7 +173,7 @@ page("denne-menu", "Denné obedové menu Bratislava - Ivánska cesta | Lucky Can
 
 page("ranajkove-menu", "Raňajky Bratislava letisko | Raňajkové menu | Lucky Canteen",
      "Raňajkové menu Lucky Canteen pri letisku Bratislava – Ivánska cesta 30/B.",
-     sub_hero("RAŇAJKOVÉ MENU") + f"""<section><div class="wrap grid2"><img src="IMG/jedlo.jpg" alt="Raňajky" style="max-width:360px;margin:0 auto">
+     sub_hero("RAŇAJKOVÉ MENU") + f"""<section><div class="wrap grid2"><img src="IMG/jedlo.jpg" alt="Raňajky" style="max-width:min(360px,100%);margin:0 auto">
 <div>{menu_list(RANAJKY_VSETKY)}</div></div>
 <div class="wrap text" style="margin-top:30px"><p>Všetky vaječné raňajky pripravujeme zo 4 kvalitných vajec z voľného výbehu (Slovensko)</p>
 <p>Ku každým raňajkám je v cene 1 kus pečiva alebo 2 krajce chleba a čerstvá zelenina.</p>
