@@ -89,7 +89,31 @@ FOOTER = """<footer><div class="wrap"><div class="cols">
 <div><h3>Naša adresa</h3>Ivánska cesta 30/B, Bratislava</div>
 <div><h3>Otvorené Po - Pia</h3>Raňajky: 7:00 - 10:30<br>Obedy: 11:00 - 14:00</div>
 <div><h3>Kontakt</h3>Tel: <a href="tel:+421948130504">+421948130504</a><br>Email: <a href="mailto:objednavky@canteen.sk">objednavky@canteen.sk</a></div>
-</div><small>© 2026 Vytvorené s láskou DigiLaf</small></div></footer>"""
+</div><small><a href="UP/ochrana-sukromia/">Ochrana súkromia a cookies</a> · <a href="javascript:lcCookies()">Nastavenia cookies</a><br>© 2026 Vytvorené s láskou DigiLaf</small></div></footer>"""
+
+GTM_ID = "GTM-KDHFM5ZH"  # Sasam (objednavky@canteen.sk), GA4 G-V48CPRMYFD ide cez GTM – Sára 2. 11. 2026
+
+# Google Consent Mode v2: predvolene všetko zamietnuté, po súhlase v lište update na granted.
+CONSENT_HEAD = """<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
+try{if(localStorage.getItem('lcConsent')==='granted')gtag('consent','update',{ad_storage:'granted',analytics_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'});}catch(e){}</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM_ID');</script>""".replace("GTM_ID", GTM_ID)
+
+GTM_BODY = f'<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={GTM_ID}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>'
+
+COOKIE_CSS = (".cookiebar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:1000;background:#111;color:#fff;padding:16px 0;box-shadow:0 -2px 12px rgba(0,0,0,.3)}"
+              ".cookiebar.open{display:block}.cookiebar .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}"
+              ".cookiebar p{margin:0;flex:1 1 320px;font-size:15px}.cookiebar a{color:#fff;text-decoration:underline}"
+              ".cb-btns{display:flex;gap:10px}.btn.cb{background:#fff;color:#111;border:2px solid #fff;min-width:120px;cursor:pointer;font-size:16px}")
+
+COOKIE_BAR = """<div class="cookiebar" id="cookiebar" role="dialog" aria-label="Súhlas s cookies"><div class="wrap">
+<p>Používame cookies na meranie návštevnosti (Google Analytics) a reklamu (Google Ads). Môžete ich prijať alebo odmietnuť. <a href="UP/ochrana-sukromia/">Viac o ochrane súkromia</a></p>
+<div class="cb-btns"><button class="btn cb" onclick="lcConsent('denied')">Odmietnuť</button><button class="btn cb" onclick="lcConsent('granted')">Prijať</button></div></div></div>
+<script>function lcConsent(v){try{localStorage.setItem('lcConsent',v)}catch(e){}
+gtag('consent','update',{ad_storage:v,analytics_storage:v,ad_user_data:v,ad_personalization:v});
+dataLayer.push({event:'consent_update',consent:v});document.getElementById('cookiebar').classList.remove('open')}
+function lcCookies(){document.getElementById('cookiebar').classList.add('open')}
+try{if(!localStorage.getItem('lcConsent'))lcCookies()}catch(e){lcCookies()}</script>"""
 
 
 def page(path, title, desc, body, active, popup=False):
@@ -111,16 +135,18 @@ try{{if(!sessionStorage.getItem('lcPop'))setTimeout(()=>document.getElementById(
 <link rel="icon" href="{up}img/logo-cervene.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Oswald:wght@400;500&display=swap" rel="stylesheet">
-<!-- GTM-TX256C9Z + Meta Pixel doplniť až s cookie lištou (súhlas) -->
-<style>{CSS.replace("IMG/", up + "img/")}</style></head>
+{CONSENT_HEAD}
+<style>{CSS.replace("IMG/", up + "img/")}{COOKIE_CSS}</style></head>
 <body>
+{GTM_BODY}
 <header><div class="wrap"><a class="logo" href="{up or './'}"><img src="{up}img/logo-invert.png" alt="Lucky Canteen"></a>
 <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')">Menu</button>
 <nav>{"".join(links)}</nav></div></header>
 <main>{body.replace("IMG/", up + "img/")}</main>
-{FOOTER}
+{FOOTER.replace("UP/", up)}
 <a class="btn red sticky-order" href="{OBJEDNAVKA}">Objednať teraz</a>
 {pop}
+{COOKIE_BAR.replace("UP/", up)}
 </body></html>"""
     out = (ROOT / path / "index.html") if path else (ROOT / "index.html")
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -187,6 +213,27 @@ page("kontakt", "Kontakt, adresa a donáška | Aircraft, Ivánska cesta | Lucky 
 <p>☏ <a href="tel:+421948130504">+421 948 130 504</a></p><p>✉ <a href="mailto:objednavky@canteen.sk">objednavky@canteen.sk</a></p></div>
 <div><h2>Naša adresa</h2><p><a href="https://maps.google.com/?q=Iv%C3%A1nska+cesta+30%2FB+Bratislava"><strong>Ivánska cesta 30/B, Bratislava</strong></a></p>
 <img src="IMG/aircraft.jpg" alt="Budova Aircraft, Ivánska cesta 30/B"></div></div></section>""", "kontakt/")
+
+page("ochrana-sukromia", "Ochrana súkromia a cookies | Lucky Canteen",
+     "Zásady ochrany osobných údajov a používania cookies na webe Lucky Canteen.",
+     sub_hero("Ochrana súkromia a cookies") + """<section class="text"><div class="wrap">
+<h2>Prevádzkovateľ</h2>
+<p>Sasam s.r.o., Medveďovej 19, 851 04 Bratislava, IČO 57589801 (prevádzka Lucky Canteen, Ivánska cesta 30/B, Bratislava). Kontakt: <a href="mailto:objednavky@canteen.sk">objednavky@canteen.sk</a>, +421 948 130 504.</p>
+<h2>Cookies a podobné technológie</h2>
+<p><strong>Nevyhnutné</strong> – uloženie vašej voľby v cookie lište a zobrazenia popup okna (v úložisku prehliadača). Bez nich web nefunguje správne, súhlas sa nevyžaduje.</p>
+<p><strong>Analytické – Google Analytics 4</strong> (cez Google Tag Manager): anonymné štatistiky návštevnosti (ktoré stránky sa čítajú, z akého zariadenia a zdroja ste prišli). Spúšťajú sa <strong>len s vaším súhlasom</strong>.</p>
+<p><strong>Reklamné – Google Ads</strong>: meranie účinnosti našich reklám a remarketing. Spúšťajú sa <strong>len s vaším súhlasom</strong>.</p>
+<p>Používame Google Consent Mode v2: kým súhlas nedáte, analytické a reklamné cookies sa neukladajú.</p>
+<h2>Právny základ a doba uchovávania</h2>
+<p>Analytické a reklamné cookies spracúvame na základe vášho súhlasu (čl. 6 ods. 1 písm. a) GDPR a § 109 zákona o elektronických komunikáciách). Údaje v Google Analytics uchovávame najviac 14 mesiacov.</p>
+<h2>Príjemcovia a prenos mimo EÚ</h2>
+<p>Údaje spracúva Google Ireland Ltd.; môžu sa prenášať do USA na základe rámca EU–US Data Privacy Framework a štandardných zmluvných doložiek. Web ďalej načítava písma Google Fonts a widget denného menu Menučka.sk – pri ich načítaní sa poskytovateľovi odovzdá vaša IP adresa.</p>
+<h2>Odvolanie súhlasu</h2>
+<p>Súhlas môžete kedykoľvek zmeniť alebo odvolať cez odkaz <a href="javascript:lcCookies()">Nastavenia cookies</a> v pätičke stránky.</p>
+<h2>Vaše práva</h2>
+<p>Máte právo na prístup k údajom, ich opravu, vymazanie, obmedzenie spracúvania, prenosnosť, právo namietať a podať sťažnosť na Úrad na ochranu osobných údajov SR (dataprotection.gov.sk). Žiadosti posielajte na <a href="mailto:objednavky@canteen.sk">objednavky@canteen.sk</a>.</p>
+<p>Posledná aktualizácia: 2. 11. 2026</p>
+</div></section>""", "")
 
 print("hotovo")
 

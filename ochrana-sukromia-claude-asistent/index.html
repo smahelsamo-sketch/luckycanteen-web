@@ -4,7 +4,10 @@
 <link rel="icon" href="../img/logo-cervene.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Oswald:wght@400;500&display=swap" rel="stylesheet">
-<!-- GTM-TX256C9Z + Meta Pixel doplniť až s cookie lištou (súhlas) -->
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
+try{if(localStorage.getItem('lcConsent')==='granted')gtag('consent','update',{ad_storage:'granted',analytics_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'});}catch(e){}</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KDHFM5ZH');</script>
 <style>
 :root{--black:#111111;--red:#9C2021;--red-dark:#7d191a;--white:#ffffff;--line:#e6e6e6;--muted:#555}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
@@ -66,8 +69,9 @@ footer a{color:#fff}footer small{display:block;text-align:center;margin-top:40px
  nav{display:none;width:100%;flex-direction:column;align-items:flex-start;background:rgba(0,0,0,.92);padding:14px}nav.open{display:flex}
  header .logo img{height:60px}.hero{padding:140px 0 110px}section{padding:50px 0}.wrap{padding:0 16px}
 }
-</style></head>
+.cookiebar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:1000;background:#111;color:#fff;padding:16px 0;box-shadow:0 -2px 12px rgba(0,0,0,.3)}.cookiebar.open{display:block}.cookiebar .wrap{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cookiebar p{margin:0;flex:1 1 320px;font-size:15px}.cookiebar a{color:#fff;text-decoration:underline}.cb-btns{display:flex;gap:10px}.btn.cb{background:#fff;color:#111;border:2px solid #fff;min-width:120px;cursor:pointer;font-size:16px}</style></head>
 <body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KDHFM5ZH" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header><div class="wrap"><a class="logo" href="../"><img src="../img/logo-invert.png" alt="Lucky Canteen"></a>
 <button class="menu-toggle" onclick="document.querySelector('nav').classList.toggle('open')">Menu</button>
 <nav><a href="../" aria-current=page>Úvod</a><a href="../o-nas/">O nás</a><a href="../denne-menu/">Denné menu</a><a href="../ranajkove-menu/">Raňajkové menu</a><a href="https://www.tysomaru.sk/blog/">Blog</a><a href="../kontakt/">Kontakt</a><a href="https://www.tysomaru.sk/uvod/">Ty Somaru</a><a href="https://luckycanteen.order.app.hd.digital/menus">Online objednávka</a></nav></div></header>
@@ -85,7 +89,15 @@ footer a{color:#fff}footer small{display:block;text-align:center;margin-top:40px
 <div><h3>Naša adresa</h3>Ivánska cesta 30/B, Bratislava</div>
 <div><h3>Otvorené Po - Pia</h3>Raňajky: 7:00 - 10:30<br>Obedy: 11:00 - 14:00</div>
 <div><h3>Kontakt</h3>Tel: <a href="tel:+421948130504">+421948130504</a><br>Email: <a href="mailto:objednavky@canteen.sk">objednavky@canteen.sk</a></div>
-</div><small>© 2026 Vytvorené s láskou DigiLaf</small></div></footer>
+</div><small><a href="../ochrana-sukromia/">Ochrana súkromia a cookies</a> · <a href="javascript:lcCookies()">Nastavenia cookies</a><br>© 2026 Vytvorené s láskou DigiLaf</small></div></footer>
 <a class="btn red sticky-order" href="https://luckycanteen.order.app.hd.digital/menus">Objednať teraz</a>
 
+<div class="cookiebar" id="cookiebar" role="dialog" aria-label="Súhlas s cookies"><div class="wrap">
+<p>Používame cookies na meranie návštevnosti (Google Analytics) a reklamu (Google Ads). Môžete ich prijať alebo odmietnuť. <a href="../ochrana-sukromia/">Viac o ochrane súkromia</a></p>
+<div class="cb-btns"><button class="btn cb" onclick="lcConsent('denied')">Odmietnuť</button><button class="btn cb" onclick="lcConsent('granted')">Prijať</button></div></div></div>
+<script>function lcConsent(v){try{localStorage.setItem('lcConsent',v)}catch(e){}
+gtag('consent','update',{ad_storage:v,analytics_storage:v,ad_user_data:v,ad_personalization:v});
+dataLayer.push({event:'consent_update',consent:v});document.getElementById('cookiebar').classList.remove('open')}
+function lcCookies(){document.getElementById('cookiebar').classList.add('open')}
+try{if(!localStorage.getItem('lcConsent'))lcCookies()}catch(e){lcCookies()}</script>
 </body></html>

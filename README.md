@@ -14,3 +14,6 @@ Postup (robí Claude kolegyne):
 
 ## Úpravy stránok
 Stránky sa generujú z `build.py` (`python3 build.py`) – needituj priamo `index.html`, ale `build.py` a potom spusti build.
+
+## Meranie (od 2. 11. 2026)
+GTM-KDHFM5ZH (Sasam, objednavky@canteen.sk; GA4 G-V48CPRMYFD ide cez GTM) + cookie lišta s Google Consent Mode v2 (predvolene denied, voľba v localStorage `lcConsent`, „Nastavenia cookies“ v pätičke). Zásady: `/ochrana-sukromia/`. Staré GTM-TX256C9Z nepoužívať.
